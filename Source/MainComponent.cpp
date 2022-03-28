@@ -5,14 +5,32 @@ MainComponent::MainComponent()
 {
  
     frequencySlider.setRange(20, 10000, 10);
+    frequencySlider.setValue(440);
     frequencySlider.setTextValueSuffix("Hz");
+    frequencySlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    frequencySlider.setSkewFactor(0.5);
     frequencySlider.onValueChange = [this]
     {
         if (currentSampleRate > 0.0)
             updateAngleDelta();
     };
     
+
+    volumeSlider.setRange(0, 1, 0.01);    
+    volumeSlider.setTextValueSuffix("%");
+    volumeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    volumeSlider.setSkewFactor(0.5);
+
+    frequencyLabel.setText("Frequency",juce::NotificationType::dontSendNotification);
+    frequencyLabel.attachToComponent(&frequencySlider, false);
+    volumeLabel.setText("Volume", juce::NotificationType::dontSendNotification);
+    volumeLabel.attachToComponent(&volumeSlider, false);
+
+
     addAndMakeVisible(frequencySlider);
+    addAndMakeVisible(volumeSlider);
+    addAndMakeVisible(frequencyLabel);
+    addAndMakeVisible(volumeLabel);
 
     // Make sure you set the size of the component after
     // you add any child components.
@@ -39,13 +57,14 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
     // its settings (i.e. sample rate, block size, etc) are changed.
     currentSampleRate = sampleRate;
     updateAngleDelta();
+    
 
     
 }
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
 {
-    auto level = 0.125f;
+    auto level = (float) volumeSlider.getValue();
     auto* leftBuffer = bufferToFill.buffer->getWritePointer(0, bufferToFill.startSample);
     auto* rightBuffer = bufferToFill.buffer->getWritePointer(1, bufferToFill.startSample);
 
@@ -81,7 +100,8 @@ void MainComponent::resized()
     const int labelSpace = 50;
     const int horizontalMargin = 100;
     const int verticalMargin = 50;
-    frequencySlider.setBounds(labelSpace, 0, getWidth() - horizontalMargin, getHeight() - verticalMargin);
+    frequencySlider.setBounds(labelSpace, 0, getWidth()/2 - horizontalMargin, getHeight() - verticalMargin);
+    volumeSlider.setBounds(labelSpace + getWidth()/2, 0, getWidth()/2 - horizontalMargin, getHeight() - verticalMargin);
 
 }
 

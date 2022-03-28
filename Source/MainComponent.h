@@ -29,8 +29,12 @@ private:
     //==============================================================================
     double currentSampleRate = 0.0, currentAngle = 0.0, angleDelta = 0.0;
     juce::Slider frequencySlider;
+    juce::Slider volumeSlider;
+    juce::Label frequencyLabel;
+    juce::Label volumeLabel;
     
     void updateAngleDelta()
+
     {
         auto cyclesPerSample = frequencySlider.getValue() / currentSampleRate;
         angleDelta = cyclesPerSample * 2.0 * juce::MathConstants<double>::pi;
